@@ -1,7 +1,8 @@
 <?php
 /**
- * TODO:
- * - request()
+ * Couchly_Client
+ * 
+ * @link    http://github.com/davidloubere/couchly for the canonical source repository
  */
 class Couchly_Client
 {
@@ -25,26 +26,18 @@ class Couchly_Client
 
     public function get($id=null)
     {
-        $ret = null;
-
-        $client = new Zend_Http_Client();
-        $response = $client->setUri($this->_computeUri($id))
-            ->request('GET');
-        
+        $doc = null;
+        $response = $this->_request($this->_computeUri($id), 'GET');
         if ($response->getStatus() === self::STATUS_GET_SUCCESS)
         {
-            $ret = json_decode($response->getBody());
+            $doc = json_decode($response->getBody());
         }
-
-        return $ret;
+        return $doc;
     }
 
-    public function post($doc, $view=null)
+    public function post($doc, $extraUri=null)
     {
-        $client = new Zend_Http_Client();
-        $response = $client->setUri($this->_computeUri($view))
-            ->setRawData(json_encode($doc), 'application/json')
-            ->request('POST');
+        $response = $this->_request($this->_computeUri($extraUri), 'POST', $doc, 'text/json');
         $body = json_decode($response->getBody());
         if ($response->getStatus() !== self::STATUS_POST_SUCCESS)
         {
@@ -55,10 +48,7 @@ class Couchly_Client
     
     public function put($id, $doc)
     {
-        $client = new Zend_Http_Client();
-        $response = $client->setUri($this->_computeUri($id))
-            ->setRawData(json_encode($doc), 'text/json')
-            ->request('PUT');
+        $response = $this->_request($this->_computeUri($id), 'PUT', $doc, 'text/json');
         if ($response->getStatus() !== self::STATUS_PUT_SUCCESS)
         {
             $body = json_decode($response->getBody());
@@ -68,14 +58,23 @@ class Couchly_Client
     
     public function delete($id, $rev)
     {
-        $client = new Zend_Http_Client();
-        $response = $client->setUri($this->_computeUri($id.'?rev='.$rev))
-            ->request('DELETE');
+        $response = $this->_request($this->_computeUri($id.'?rev='.$rev), 'DELETE');
         if ($response->getStatus() !== self::STATUS_DELETE_SUCCESS)
         {
             $body = json_decode($response->getBody());
             throw new Couchly_Exception($body->error.': '.$body->reason);
         }
+    }
+    
+    protected function _request($uri, $method, $data=null, $enctype=null)
+    {
+        $client = new Zend_Http_Client();
+        $client->setUri($uri);
+        if (!is_null($data))
+        {
+            $client->setRawData(json_encode($data), $enctype);
+        }
+        return $client->request($method);
     }
     
     protected function _computeUri($extraUri=null)
