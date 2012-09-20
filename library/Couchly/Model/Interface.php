@@ -1,5 +1,5 @@
 <?php
-interface Couchly_Interface
+interface Couchly_Model_Interface
 {
     public function isNew();
 

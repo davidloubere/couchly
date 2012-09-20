@@ -1,5 +1,5 @@
 <?php
-abstract class Couchly_Entity
+abstract class Couchly_Model_Abstract implements Couchly_Model_Interface
 {
     abstract protected function _populate(stdClass $doc);
 
