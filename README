@@ -1,2 +1,7 @@
 Couchly is a simple CouchDB object data mapper (ODM) written in PHP
+
+- Dependencies
+For now, Couchly relies on Zend Framework components.
+
+- Author
 git@davidloubere.com
