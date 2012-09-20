@@ -1,8 +1,8 @@
 <?php
 /**
- * TODO:
- * - createDB(), deleteDB()
- * - compact
+ * Couchly_Facade
+ * 
+ * @link    http://github.com/davidloubere/couchly for the canonical source repository
  */
 class Couchly_Facade
 {
@@ -11,11 +11,11 @@ class Couchly_Facade
      */
     protected $_couchlyClient = null;
 
-    public function __construct($dbName)
+    public function __construct($dbName, $host='localhost', $port=5984)
     {
-        $this->_couchlyClient = new Couchly_Client($dbName);
+        $this->_couchlyClient = new Couchly_Client($dbName, $host, $port);
     }
-
+    
     public function retrieve($id)
     {
         return $this->_couchlyClient->get($id);
