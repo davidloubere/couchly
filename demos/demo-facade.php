@@ -5,26 +5,8 @@
  * For this demo to work, you need to create a database: curl -X PUT http://127.0.0.1:5984/db_demo1
  */
 
-// Define path to library directory
-define('LIBRARY_PATH', '../library');
-
-// Ensure library/ is on include_path
-set_include_path(implode(PATH_SEPARATOR, array(
-    LIBRARY_PATH, get_include_path(),
-)));
-
-// Zend loader
-require_once(LIBRARY_PATH.'/Zend/Loader.php');
-
-// Couchly autoloading
-function __autoload($class)
-{
-    $path = implode('/', explode('_', $class));
-    if (file_exists(LIBRARY_PATH.'/'.$path.'.php'))
-    {
-        require_once(LIBRARY_PATH.'/'.$path.'.php');
-    }
-}
+// Include Couchly application bootstrap
+require('../library/Couchly/bootstrap.php');
 
 // Instantiate a Couchly facade
 $couchlyFacade = new Couchly_Facade('db_demo1');
