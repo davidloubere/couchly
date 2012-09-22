@@ -12,9 +12,9 @@ class Couchly_Generator
     
     protected $_tab = '    ';
     
-    protected $_schema = null;
+    protected $_dirSchema = null;
     
-    protected $_outputDir = null;
+    protected $_dirOutput = null;
     
     protected $_classnamePrefix = null;
     
@@ -26,12 +26,12 @@ class Couchly_Generator
     {
         if (array_key_exists('dir.schema', $buildProperties))
         {
-            $this->_schema = new Zend_Config_Yaml($buildProperties['dir.schema'] . '/schema.yml');
+            $this->_dirSchema = new Zend_Config_Yaml($buildProperties['dir.schema'] . '/schema.yml');
         }
         
         if (array_key_exists('dir.output', $buildProperties))
         {
-            $this->_outputDir = $buildProperties['dir.output'];
+            $this->_dirOutput = $buildProperties['dir.output'];
         }
         
         if (array_key_exists('classname.prefix', $buildProperties))
@@ -39,27 +39,42 @@ class Couchly_Generator
             $this->_classnamePrefix = $buildProperties['classname.prefix'];
         }
         
+        header('Content-Type: text/plain');
+        
         $this->_generate();
+        
+        $this->_log('Done!');
     }
     
-    protected function _output($modelName)
+    protected function _write($modelName)
     {
-        header('Content-Type: text/plain');
-    
+        $file = $this->_dirOutput . '/' . $this->_camelize($modelName, false) . '.php';
+        
+        $this->_log('Writing file: ' . $file, false);
+        
         file_put_contents(
-            $this->_outputDir . '/' . $this->_camelize($modelName, false) . '.php',
+            $file,
             implode($this->_nl, $this->_output)
         );
-    
+        
         unset($this->_output);
+        unset($this->_classProperties);
+        
+        $this->_log($this->_tab . 'Ok');
+    }
+    
+    protected function _log($trace, $nl=true)
+    {
+        echo $trace . ($nl ? $this->_nl : '');
     }
     
     protected function _generate()
     {
-        foreach ($this->_schema as $modelName => $modelDefinition)
+        foreach ($this->_dirSchema as $modelName => $modelDefinition)
         {
-            $className = $this->_classnamePrefix . ucfirst($modelName);
+            $this->_log('Creating model: ' . $modelName, false);
             
+            $className = $this->_classnamePrefix . $this->_camelize($modelName, false);
             
             /*
              * Class header
@@ -237,12 +252,14 @@ class Couchly_Generator
             
             $this->_output[] = "}";
             
+            $this->_log($this->_tab . 'Ok');
+            
             
             /*
              * Genrate model file
              */
             
-            $this->_output($modelName);
+            $this->_write($modelName);
         }
     }
     
