@@ -1,15 +1,31 @@
 #!/usr/bin/php
 <?php
-// Include Couchly application bootstrap
-require('../library/Couchly/bootstrap.php');
-
-//
-$buildProperties = array(
-    'dir.schema' => '/var/projects/mmt-server/application/configs/couchly',
-    'dir.output' => '/var/projects/mmt-server/application/models/couchly',
-    'classname.prefix' => 'Application_Model_Couchly_'
-);
-
-//
-$couchlyGenerator = new Couchly_Generator($buildProperties);
+if ($argc != 2 || in_array($argv[1], array('--help', '-help', '-h', '-?')))
+{
+    echo "usage: couchly-gen <PATH/TO/YOUR_APP/CONFIGS/build.yml>\n";
+}
+else
+{
+    // Include Couchly application bootstrap
+    require(dirname(realpath(__FILE__)) . '/../bootstrap.php');
+    
+    // Retrieve the build properties
+    if (file_exists($argv[1]))
+    {
+        $configBuild = new Zend_Config_Yaml($argv[1]);
+        if (!$configBuild->valid())
+        {
+            echo ("Couchly error: build configuration file not valid '$argv[1]'.\n");
+        }
+        else
+        {
+            // Instantiate the generator
+            $couchlyGenerator = new Couchly_Generator($configBuild);
+        }
+    }
+    else
+    {
+        die("Couchly error: build configuration file not found '$argv[1]'.\n");
+    }
+}
 ?>

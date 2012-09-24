@@ -22,28 +22,47 @@ class Couchly_Generator
     
     protected $_output = array();
     
-    public function __construct(array $buildProperties)
+    public function __construct(Zend_Config_Yaml $configBuild)
     {
-        if (array_key_exists('dir.schema', $buildProperties))
+        try
         {
-            $this->_dirSchema = new Zend_Config_Yaml($buildProperties['dir.schema'] . '/schema.yml');
+            if (isset($configBuild->dir->schema))
+            {
+                $this->_dirSchema = new Zend_Config_Yaml($configBuild->dir->schema);
+            }
+            else
+            {
+                throw new Couchly_Exception("Build requires the property dir:schema");
+            }
+            
+            if (isset($configBuild->dir->output))
+            {
+                $this->_dirOutput = $configBuild->dir->output;
+            }
+            else
+            {
+                throw new Couchly_Exception("Build requires the property dir:output");
+            }
+            
+            if (isset($configBuild->classname->prefix))
+            {
+                $this->_classnamePrefix = $configBuild->classname->prefix;
+            }
+            else
+            {
+                throw new Couchly_Exception("Build requires the property classname:prefix");
+            }
+            
+            header('Content-Type: text/plain');
+            
+            $this->_generate();
+            
+            $this->_log('Done!');
         }
-        
-        if (array_key_exists('dir.output', $buildProperties))
+        catch(Couchly_Exception $ce)
         {
-            $this->_dirOutput = $buildProperties['dir.output'];
+            die($ce->getMessage() . $this->_nl);
         }
-        
-        if (array_key_exists('classname.prefix', $buildProperties))
-        {
-            $this->_classnamePrefix = $buildProperties['classname.prefix'];
-        }
-        
-        header('Content-Type: text/plain');
-        
-        $this->_generate();
-        
-        $this->_log('Done!');
     }
     
     protected function _write($modelName)

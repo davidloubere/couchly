@@ -6,7 +6,7 @@
  */
 
 // Include Couchly application bootstrap
-require('../library/Couchly/bootstrap.php');
+require(dirname(realpath(__FILE__)) . '/../bootstrap.php');
 
 // Instantiate a Couchly facade
 $couchlyFacade = new Couchly_Facade('db_demo1');
