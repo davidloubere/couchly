@@ -81,7 +81,7 @@ class Couchly_Generator
              */
             
             $this->_output[] = "<?php";
-            $this->_output[] = "class $className extends Couchly_Model_Abstract";
+            $this->_output[] = "class $className extends Couchly_Model_Mapper";
             $this->_output[] = "{";
 
             
@@ -89,10 +89,6 @@ class Couchly_Generator
              * Class properties
              */
             
-            $this->_addClassProperty('couchly_facade', 'Couchly_Facade', self::PHP_KW_PRIVATE, true);
-            $this->_addClassProperty('db_name', 'string', self::PHP_KW_PRIVATE, true);
-            $this->_addClassProperty('id', 'int', self::PHP_KW_PROTECTED);
-            $this->_addClassProperty('rev', 'string', self::PHP_KW_PROTECTED);
             foreach ($modelDefinition->fields as $fieldName => $fieldDefinition)
             {
                 $this->_addClassProperty($fieldName, $fieldDefinition->type, self::PHP_KW_PROTECTED, false, true);
@@ -108,18 +104,6 @@ class Couchly_Generator
              * Class methods
              */
             
-            // Contructor
-            $content = $this->_tab . $this->_tab . 'if (!is_null($id))
-        {
-            $doc = self::_getCouchlyFacade()->retrieve($id);
-            if (is_null($doc))
-            {
-                throw new Couchly_Exception("Document not found (id: $id)");
-            }
-            $this->_populate($doc);
-        }';
-            $this->_output[] = $this->_computeMethod('__constructor', self::PHP_KW_PUBLIC, false, $content, '$id=null');            
-            
             // Getters
             foreach ($this->_classProperties as $propertyName => $propertyDefinition)
             {
@@ -132,14 +116,6 @@ class Couchly_Generator
             // GetModelType()
             $content = $this->_tab . $this->_tab . "return '$modelName';";
             $this->_output[] = $this->_computeMethod('getModelType', self::PHP_KW_PUBLIC, false, $content);
-            
-            // isNew()
-            $content = $this->_tab . $this->_tab . 'return is_null($this->_rev)?true:false;';
-            $this->_output[] = $this->_computeMethod('isNew', self::PHP_KW_PUBLIC, false, $content);
-            
-            // assignId()
-            $content = $this->_tab . $this->_tab . '$this->_id = $id;';
-            $this->_output[] = $this->_computeMethod('assignId', self::PHP_KW_PUBLIC, false, $content, '$id');
             
             // setData()
             $content = array();
@@ -204,46 +180,6 @@ class Couchly_Generator
                 }
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
-            
-            // fetch()
-            $content = array();
-            $content[] = $this->_tab . $this->_tab . '$coll' . $this->_camelize($modelName, false) .'s = array();
-    
-        $result = self::_getCouchlyFacade()->fetch($criteria);
-        if (isset($result->total_rows) && $result->total_rows > 0)
-        {
-            foreach ($result->rows as $doc)
-            {
-                $' . $modelName .' = new ' . $className . '();
-                $' . $modelName .'->_populate($doc->value);
-                $coll' . $this->_camelize($modelName, false) .'s[] = $' . $modelName .'->_getData();
-            }
-        }
-    
-        return $collAnnouncements;';
-            $content[] = $this->_tab . $this->_tab;
-            $this->_output[] = $this->_computeMethod('fetch', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content), 'array $criteria=null');
-            
-            // delete()
-            $content = $this->_tab . $this->_tab . 'self::_getCouchlyFacade()->delete($id, $rev);';
-            $this->_output[] = $this->_computeMethod('delete', self::PHP_KW_PUBLIC, true, $content, '$id, $rev');
-            
-            // initCouchlyFacade()
-            $content = array();
-            $content[] = $this->_tab . $this->_tab . 'if (is_null(self::$_couchlyFacade))
-        {
-            self::$_couchlyFacade = new Couchly_Facade($dbName);
-        }
-        else
-        {
-            throw new Couchly_Exception("DB already initialized (db: $dbName)");
-        }';
-            $content[] = $this->_tab . $this->_tab;
-            $this->_output[] = $this->_computeMethod('initCouchlyFacade', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content), '$dbName');
-            
-            // _getCouchlyFacade()
-            $content = $this->_tab . $this->_tab . 'return self::$_couchlyFacade;';
-            $this->_output[] = $this->_computeMethod('getCouchlyFacade', self::PHP_KW_PROTECTED, true, $content);
             
             
             /*
