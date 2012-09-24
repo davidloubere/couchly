@@ -13,12 +13,12 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
   - Symlink to Couchly and Zend librairies into your application library folder
 
     ```
-    % cd /PATH/TO/YOUR_APP/LIB
-    % ln -s /PATH/TO/COUCHLY/library/Couchly Couchly
-    % ln -s /PATH/TO/ZEND_FRAMEWORK/library/Zend Zend
+    $ cd /PATH/TO/YOUR_APP/LIB
+    $ ln -s /PATH/TO/COUCHLY/library/Couchly Couchly
+    $ ln -s /PATH/TO/ZEND_FRAMEWORK/library/Zend Zend
     ```
 
-  - Define the path to your application library folder into /PATH/TO/COUCHLY/bootstrap.php
+  - Define the path to your application library folder into `/PATH/TO/COUCHLY/bootstrap.php`
 
     ```
     // Define path to library directory
@@ -27,19 +27,19 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
   - Enable the Couchly command line generator
 
-    Make couchly-gen.php executable
+    Make `couchly-gen.php` executable
     
     ```
-    % chmod +x /PATH/TO/COUCHLY/bin/couchly-gen.php
+    $ chmod +x /PATH/TO/COUCHLY/bin/couchly-gen.php
     ```
     
-    Add an alias for the couchly-gen command (e.g. into your .bashrc)
+    Add an alias for the couchly-gen command (e.g. into your `.bashrc`)
     
     ```
     alias couchly-gen=/PATH/TO/COUCHLY/bin/couchly-gen.php
     ```
 
-  - To initialize Couchly into your application, you need to include the bootstrap (e.g. into your index.php)
+  - To initialize Couchly into your application, you need to include the bootstrap (e.g. into your `index.php`)
 
     ```
     require('/PATH/TO/COUCHLY/bootstrap.php');
@@ -47,7 +47,7 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
 ## Command line usage
 
-  - Create a file named 'schema.yml' describing your data as follow
+  - Create a file named `schema.yml` describing your data as follow
 
     ```
     model_name_a:
@@ -64,7 +64,7 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
           type: string
     ```
 
-  - Create a file named 'build.yml' defining the properties for build time
+  - Create a file named `build.yml` defining the properties for build time
 
     ```
     dir:
@@ -77,5 +77,5 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
   - Run couchly-gen command
 
     ```
-    % couchly-gen /PATH/TO/YOUR_APP/CONFIGS/build.yml
+    $ couchly-gen /PATH/TO/YOUR_APP/CONFIGS/build.yml
     ```
