@@ -63,7 +63,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
     public static function fetch(array $criteria=null)
     {
         $collObjects = array();
-    
+
         $result = self::_getCouchlyFacade()->fetch($criteria);
         if (isset($result->total_rows) && $result->total_rows > 0)
         {
@@ -75,9 +75,9 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 $collObjects[] = $object->_getData();
             }
         }
-    
+
         return $collObjects;
-        
+
     }
 
     public static function delete($id, $rev)
@@ -95,7 +95,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         {
             throw new Couchly_Exception("DB already initialized (db: $dbName)");
         }
-        
+
     }
 
     protected static function _getCouchlyFacade()

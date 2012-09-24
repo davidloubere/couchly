@@ -3,7 +3,7 @@ interface Couchly_Model_Interface
 {
     public function isNew();
 
-    public function getModelType();
+    public function getModelName();
 
     public function getId();
     

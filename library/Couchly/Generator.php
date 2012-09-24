@@ -103,6 +103,13 @@ class Couchly_Generator
             $this->_output[] = "class $className extends Couchly_Model_Mapper";
             $this->_output[] = "{";
 
+
+            /*
+             * Constants
+             */
+            
+            $this->_output[] = $this->_computeConstant('MODEL_NAME', "'" . $modelName . "'", array('Model name'));
+            
             
             /*
              * Class properties
@@ -132,9 +139,9 @@ class Couchly_Generator
                 }
             }
             
-            // GetModelType()
-            $content = $this->_tab . $this->_tab . "return '$modelName';";
-            $this->_output[] = $this->_computeMethod('getModelType', self::PHP_KW_PUBLIC, false, $content);
+            // GetModelName()
+            $content = $this->_tab . $this->_tab . "return self::MODEL_NAME;";
+            $this->_output[] = $this->_computeMethod('getModelName', self::PHP_KW_PUBLIC, false, $content);
             
             // setData()
             $content = array();
@@ -228,12 +235,30 @@ class Couchly_Generator
         );
     }
     
+    protected function _computeDocBlock(array $info)
+    {
+        $docBlock = array();
+        $docBlock[] = $this->_tab . '/**';
+        foreach ($info as $line)
+        {
+            $docBlock[] = $this->_tab . ' * ' . $line;
+        }
+        $docBlock[] = $this->_tab . ' */';
+        return implode($this->_nl, $docBlock);
+    }
+    
+    protected function _computeConstant($name, $value, array $docBlockInfo)
+    {
+        $constant = array();
+        $constant[] = $this->_computeDocBlock($docBlockInfo);
+        $constant[] = $this->_tab . 'const ' . $name . ' = ' . $value . ';';
+        return implode($this->_nl, $constant) . $this->_nl;
+    }
+    
     protected function _computeProperty($name, $type, $visibility, $isStatic)
     {
         $property = array();
-        $property[] = $this->_tab . '/**';
-        $property[] = $this->_tab . ' * @var ' . $type;
-        $property[] = $this->_tab . ' */';
+        $property[] = $this->_computeDocBlock(array('@var ' . $type));
         $property[] = $this->_tab . $visibility . ' ' . ($isStatic ? self::PHP_KW_STATIC . ' ' : '') . ($visibility === self::PHP_KW_PUBLIC ? '$' : '$_') . self::_camelize($name) . ' = null;';
         return implode($this->_nl, $property) . $this->_nl;
     }
@@ -251,9 +276,7 @@ class Couchly_Generator
     protected function _computeGetter($name, $type, $visibility)
     {
         $getter = array();
-        $getter[] = $this->_tab . '/**';
-        $getter[] = $this->_tab . ' * @return ' . $type;
-        $getter[] = $this->_tab . ' */';
+        $getter[] = $this->_computeDocBlock(array('@return ' . $type));
         $getter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' get' . self::_camelize($name, false) . '()';
         $getter[] = $this->_tab . '{';
         $getter[] = $this->_tab . $this->_tab . self::PHP_KW_RETURN . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::_camelize($name) . ';';
