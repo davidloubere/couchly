@@ -1,12 +1,17 @@
+Couchly
+=======
+
 Couchly is a simple CouchDB object-document mapper (ODM) written in PHP
 
 
-DEPENDENCIES
+Dependencies
+------------
 
 For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
 
-INSTALLATION
+Installation
+------------
 
 1. Symlink to Couchly and Zend librairies into your application library folder
 
@@ -34,7 +39,8 @@ INSTALLATION
   require('/PATH/TO/COUCHLY/bootstrap.php');
   
 
-COMMAND LINE USAGE
+Command line usage
+------------------
 
 1. Create a file named 'schema.yml' describing your data as follow
 
@@ -60,8 +66,3 @@ COMMAND LINE USAGE
     prefix: Your_App_
     
 3. Run couchly-gen
-
-
-AUTHOR
-
-contact@davidloubere.com
