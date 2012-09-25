@@ -10,19 +10,18 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
 ## Installation
 
-  - Symlink to Couchly and Zend librairies into your application library folder
+  - Symlink to Zend Framework library into Couchly library folder
+
+    ```
+    $ cd /PATH/TO/COUCHLY/library
+    $ ln -s /PATH/TO/ZEND_FRAMEWORK/library/Zend Zend
+    ```
+
+  - Symlink to Couchly library into your application library folder
 
     ```
     $ cd /PATH/TO/YOUR_APP/LIB
     $ ln -s /PATH/TO/COUCHLY/library/Couchly Couchly
-    $ ln -s /PATH/TO/ZEND_FRAMEWORK/library/Zend Zend
-    ```
-
-  - Define the path to your application library folder into `/PATH/TO/COUCHLY/bootstrap.php`
-
-    ```
-    // Define path to library directory
-    define('LIBRARY_PATH', '/PATH/TO/YOUR_APP/LIB');
     ```
 
   - Enable the Couchly command line generator
@@ -39,10 +38,14 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
     alias couchly-gen=/PATH/TO/COUCHLY/bin/couchly-gen.php
     ```
 
-  - To initialize Couchly into your application, you need to include the bootstrap (e.g. into your `index.php`)
+  - Initialize Couchly into your application (e.g. into your `index.php`)
 
     ```
-    require('/PATH/TO/COUCHLY/bootstrap.php');
+    // Include Couchly class
+    require_once('/PATH/TO/YOUR_APP/LIB/Couchly/../Couchly.php');
+    
+    // Initialize Couchly
+    Couchly::init();
     ```
 
 ## Command line usage

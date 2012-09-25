@@ -5,8 +5,11 @@
  * For this demo to work, you need to create a database: curl -X PUT http://127.0.0.1:5984/db_demo1
  */
 
-// Include Couchly application bootstrap
-require(dirname(realpath(__FILE__)) . '/../bootstrap.php');
+// Include Couchly bootstrap class
+require_once(dirname(realpath(__FILE__)) . '/../library/Couchly/Bootstrap.php');
+
+// Initialize Couchly
+Couchly_Bootstrap::init();
 
 // Instantiate a Couchly facade
 $couchlyFacade = new Couchly_Facade('db_demo1');
