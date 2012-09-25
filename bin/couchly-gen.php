@@ -6,9 +6,12 @@ if ($argc != 2 || in_array($argv[1], array('--help', '-help', '-h', '-?')))
 }
 else
 {
-    // Include Couchly application bootstrap
-    require(dirname(realpath(__FILE__)) . '/../bootstrap.php');
-    
+    // Include Couchly bootstrap class
+    require_once(dirname(realpath(__FILE__)) . '/../library/Couchly/Bootstrap.php');
+
+    // Initialize Couchly
+    Couchly_Bootstrap::init();
+
     // Retrieve the build properties
     if (file_exists($argv[1]))
     {

@@ -26,7 +26,7 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
   - Enable the Couchly command line generator
 
-    Make `couchly-gen.php` executable
+    If not already done, make `couchly-gen.php` executable
     
     ```
     $ chmod +x /PATH/TO/COUCHLY/bin/couchly-gen.php
