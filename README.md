@@ -41,11 +41,11 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
   - Initialize Couchly into your application (e.g. into your `index.php`)
 
     ```
-    // Include Couchly class
-    require_once('/PATH/TO/YOUR_APP/LIB/Couchly/../Couchly.php');
-    
+    // Include Couchly bootstrap class
+    require_once('/PATH/TO/YOUR_APP/LIB/Couchly/Bootstrap.php');
+
     // Initialize Couchly
-    Couchly::init();
+    Couchly_Bootstrap::init();
     ```
 
 ## Command line usage
