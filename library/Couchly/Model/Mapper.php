@@ -72,7 +72,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 $className = get_called_class();
                 $object = new $className;
                 $object->_populate($doc->value);
-                $collObjects[] = $object->_getData();
+                $collObjects[] = $object;
             }
         }
 
