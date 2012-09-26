@@ -25,7 +25,10 @@ class Couchly_Bootstrap
      */
     private static function _loader($className)
     {
-        require_once(str_replace('_', '/', $className . '.php'));
+        if (preg_match('/^Couchly|^Zend/', $className))
+        {
+            require_once(str_replace('_', '/', $className . '.php'));
+        }
     }
 }
 ?>
