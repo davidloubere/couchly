@@ -99,8 +99,17 @@ class Couchly_Generator
              * Class header
              */
             
+            // Inheritance
+            if (isset($modelDefinition->extends))
+            {
+                $parentClassName = $modelDefinition->extends;
+            }
+            else
+            {
+                $parentClassName = 'Couchly_Model_Mapper';                
+            }
             $this->_output[] = "<?php";
-            $this->_output[] = "class $className extends Couchly_Model_Mapper";
+            $this->_output[] = "class $className extends $parentClassName";
             $this->_output[] = "{";
 
 
