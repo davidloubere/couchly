@@ -37,7 +37,7 @@ class Couchly_Client
 
     public function post($doc, $extraUri=null)
     {
-        $response = $this->_request($this->_computeUri($extraUri), 'POST', $doc, 'text/json');
+        $response = $this->_request($this->_computeUri($extraUri), 'POST', $doc, 'application/json');
         $body = json_decode($response->getBody());
         if ($response->getStatus() !== self::STATUS_POST_SUCCESS)
         {
@@ -48,7 +48,7 @@ class Couchly_Client
     
     public function put($id, $doc)
     {
-        $response = $this->_request($this->_computeUri($id), 'PUT', $doc, 'text/json');
+        $response = $this->_request($this->_computeUri($id), 'PUT', $doc, 'application/json');
         if ($response->getStatus() !== self::STATUS_PUT_SUCCESS)
         {
             $body = json_decode($response->getBody());
