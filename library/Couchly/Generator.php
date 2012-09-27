@@ -102,7 +102,7 @@ class Couchly_Generator
             // Inheritance
             if (isset($modelDefinition->extends))
             {
-                $parentClassName = $modelDefinition->extends;
+                $parentClassName = $this->_classnamePrefix . $this->_camelize($modelDefinition->extends, false);
             }
             else
             {
