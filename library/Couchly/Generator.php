@@ -12,13 +12,17 @@ class Couchly_Generator
     
     protected $_tab = '    ';
     
-    protected $_dirSchema = null;
+    protected $_dirConfig = null;
     
-    protected $_dirOutput = null;
+    protected $_dirModel = null;
     
-    protected $_classnamePrefix = null;
+    protected $_classPath = '';
+    
+    protected $_classPrefix = '';
     
     protected $_classProperties = array();
+    
+    protected $_classMap = array();
     
     protected $_output = array();
     
@@ -26,31 +30,32 @@ class Couchly_Generator
     {
         try
         {
-            if (isset($configBuild->dir->schema))
+            if (isset($configBuild->dir->config))
             {
-                $this->_dirSchema = new Zend_Config_Yaml($configBuild->dir->schema);
+                $this->_dirConfig = $configBuild->dir->config;
             }
             else
             {
-                throw new Couchly_Exception("Build requires the property dir:schema");
+                throw new Couchly_Exception("Build requires the property dir:config");
             }
             
-            if (isset($configBuild->dir->output))
+            if (isset($configBuild->dir->model))
             {
-                $this->_dirOutput = $configBuild->dir->output;
+                $this->_dirModel = $configBuild->dir->model;
             }
             else
             {
-                throw new Couchly_Exception("Build requires the property dir:output");
+                throw new Couchly_Exception("Build requires the property dir:model");
             }
             
-            if (isset($configBuild->classname->prefix))
+            if (isset($configBuild->class->path))
             {
-                $this->_classnamePrefix = $configBuild->classname->prefix;
+                $this->_classPath = $configBuild->class->path;
             }
-            else
+            
+            if (isset($configBuild->class->prefix))
             {
-                throw new Couchly_Exception("Build requires the property classname:prefix");
+                $this->_classPrefix = $configBuild->class->prefix;
             }
             
             header('Content-Type: text/plain');
@@ -65,11 +70,15 @@ class Couchly_Generator
         }
     }
     
-    protected function _write($modelName)
+    protected function _writeModel($modelName)
     {
-        $file = $this->_dirOutput . '/' . $this->_camelize($modelName, false) . '.php';
+        $fileName = self::camelize($modelName, false) . '.php';
+        $className = $this->_computeClassName($modelName);
         
-        $this->_log('Writing file: ' . $file, false);
+        $this->_classMap[$className] = empty($this->_classPath) ? $fileName : $this->_classPath . '/' . $fileName;
+        
+        $file = $this->_dirModel . '/' . $fileName;
+        $this->_log('Writing model file: ' . $file, false);
         
         file_put_contents(
             $file,
@@ -82,18 +91,55 @@ class Couchly_Generator
         $this->_log($this->_tab . 'Ok');
     }
     
+    protected function _writeClassmap()
+    {
+        $this->_log('Creating classmap: ', false);
+        
+        $file = $this->_dirConfig . '/classmap.php';
+        
+        $arrayLines = array();
+        foreach ($this->_classMap as $className => $classPath)
+        {
+            $arrayLines[] = $this->_tab . "'" . $className . "' => '" . $classPath . "'";
+        }
+        
+        $output[] = '<?php';
+        $output[] = 'return array(';
+        $output[] = implode(',' . $this->_nl, $arrayLines);
+        $output[] = ');';
+        $output[] = '?>';
+        
+        $this->_log($this->_tab . 'Ok');
+        
+        $this->_log('Writing classmap file: ' . $file, false);
+        
+        file_put_contents(
+            $file,
+            implode($this->_nl, $output)
+        );
+        
+        $this->_log($this->_tab . 'Ok');
+    }
+    
     protected function _log($trace, $nl=true)
     {
         echo $trace . ($nl ? $this->_nl : '');
     }
     
+    protected function _computeClassName($modelName)
+    {
+        return $this->_classPrefix . self::camelize($modelName, false);
+    }
+    
     protected function _generate()
     {
-        foreach ($this->_dirSchema as $modelName => $modelDefinition)
+        $schemaConfig = new Zend_Config_Yaml($this->_dirConfig . '/schema.yml');
+        
+        foreach ($schemaConfig as $modelName => $modelDefinition)
         {
             $this->_log('Creating model: ' . $modelName, false);
             
-            $className = $this->_classnamePrefix . $this->_camelize($modelName, false);
+            $className = $this->_computeClassName($modelName);
             
             /*
              * Class header
@@ -102,7 +148,7 @@ class Couchly_Generator
             // Inheritance
             if (isset($modelDefinition->extends))
             {
-                $parentClassName = $this->_classnamePrefix . $this->_camelize($modelDefinition->extends, false);
+                $parentClassName = $this->_classPrefix . self::camelize($modelDefinition->extends, false);
             }
             else
             {
@@ -158,7 +204,7 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . '$this->_' . self::_camelize($propertyName) . ' = $data[\'' . $propertyName . '\'];';
+                    $content[] = $this->_tab . $this->_tab . '$this->_' . self::camelize($propertyName) . ' = $data[\'' . $propertyName . '\'];';
                 }
             }
             $this->_output[] = $this->_computeMethod('setData', self::PHP_KW_PUBLIC, false, implode($this->_nl, $content), 'array $data');
@@ -180,7 +226,7 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . "\$doc['data']['" . $propertyName . "'] = " . '$this->_' . self::_camelize($propertyName) . ';';
+                    $content[] = $this->_tab . $this->_tab . "\$doc['data']['" . $propertyName . "'] = " . '$this->_' . self::camelize($propertyName) . ';';
                 }
             }
             $content[] = $this->_tab . $this->_tab;
@@ -196,7 +242,7 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . $this->_tab . "'" . $propertyName . "' => \$this->_" . self::_camelize($propertyName) . ',';
+                    $content[] = $this->_tab . $this->_tab . $this->_tab . "'" . $propertyName . "' => \$this->_" . self::camelize($propertyName) . ',';
                 }
             }
             $content[] = $this->_tab . $this->_tab . ');';
@@ -211,7 +257,7 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . "\$this->_" . $this->_camelize($propertyName) . " = \$doc->data->$propertyName;";
+                    $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = \$doc->data->$propertyName;";
                 }
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
@@ -227,11 +273,18 @@ class Couchly_Generator
             
             
             /*
-             * Genrate model file
+             * Generate model file
              */
             
-            $this->_write($modelName);
+            $this->_writeModel($modelName);
         }
+        
+        
+        /*
+         * Generate classmap file
+         */
+        
+        $this->_writeClassmap();
     }
     
     protected function _addClassProperty($name, $type, $visibility, $isStatic=false, $isData=false)
@@ -268,7 +321,7 @@ class Couchly_Generator
     {
         $property = array();
         $property[] = $this->_computeDocBlock(array('@var ' . $type));
-        $property[] = $this->_tab . $visibility . ' ' . ($isStatic ? self::PHP_KW_STATIC . ' ' : '') . ($visibility === self::PHP_KW_PUBLIC ? '$' : '$_') . self::_camelize($name) . ' = null;';
+        $property[] = $this->_tab . $visibility . ' ' . ($isStatic ? self::PHP_KW_STATIC . ' ' : '') . ($visibility === self::PHP_KW_PUBLIC ? '$' : '$_') . self::camelize($name) . ' = null;';
         return implode($this->_nl, $property) . $this->_nl;
     }
     
@@ -286,14 +339,14 @@ class Couchly_Generator
     {
         $getter = array();
         $getter[] = $this->_computeDocBlock(array('@return ' . $type));
-        $getter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' get' . self::_camelize($name, false) . '()';
+        $getter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' get' . self::camelize($name, false) . '()';
         $getter[] = $this->_tab . '{';
-        $getter[] = $this->_tab . $this->_tab . self::PHP_KW_RETURN . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::_camelize($name) . ';';
+        $getter[] = $this->_tab . $this->_tab . self::PHP_KW_RETURN . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::camelize($name) . ';';
         $getter[] = $this->_tab . '}';
         return implode($this->_nl, $getter) . $this->_nl;
     }
 
-    protected static function _camelize($value, $lcfirst=true)
+    public static function camelize($value, $lcfirst=true)
     {
         $value = preg_replace("/([_-\s]?([a-z0-9]+))/e", "ucwords('\\2')", $value);
         return ($lcfirst ? strtolower($value[0]) : strtoupper($value[0])) . substr($value, 1);

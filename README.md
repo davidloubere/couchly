@@ -40,17 +40,20 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
   - Initialize Couchly into your application (e.g. into your `index.php`)
 
-    ```
+    ``` 
     // Include Couchly bootstrap class
     require_once('/PATH/TO/YOUR_APP/LIB/Couchly/Bootstrap.php');
 
     // Initialize Couchly
-    Couchly_Bootstrap::init();
+    Couchly_Bootstrap::init('/PATH/TO/YOUR_APP/CONFIGS/classmap.php');
+    
+    // Add the generated 'classes' directory to the include path
+    set_include_path('/PATH/TO/YOUR_APP/MODELS' . PATH_SEPARATOR . get_include_path());
     ```
 
 ## Command line usage
 
-  - Create a file named `schema.yml` describing your data as follow
+  - Into directory `/PATH/TO/YOUR_APP/CONFIGS`, create a file named `schema.yml` describing your data
 
     ```
     model_name_a:
@@ -67,16 +70,22 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
           type: string
     ```
 
-  - Create a file named `build.yml` defining the properties for build time
+  - Again, into directory `/PATH/TO/YOUR_APP/CONFIGS`, create a file named `build.yml` defining the properties for build time
 
     ```
     dir:
-      schema: /PATH/TO/YOUR_APP/CONFIGS/schema.yml
-      output: /PATH/TO/YOUR_APP/MODELS/
-    classname:
-      prefix: Your_App_
+      config: /PATH/TO/YOUR_APP/CONFIGS
+      model: /PATH/TO/YOUR_APP/MODELS
     ```
 
+    NB : Optionally, you can define specific properties for the model classes
+    
+    ```
+    class:
+      path: ./MODELS
+      prefix: Your_App_
+    ```
+    
   - Run couchly-gen command
 
     ```
