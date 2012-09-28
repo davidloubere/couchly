@@ -2,7 +2,7 @@
 class Couchly_Bootstrap
 {
     private static $_classmap = null;
-    
+
     /**
      * Couchly initialization
      */
@@ -13,14 +13,22 @@ class Couchly_Bootstrap
             // Retrieve and assign classmap
             self::$_classmap = include($classmapFile);
         }
-        
+
+        // Define path to Couchly library directory
+        define('COUCHLY_LIBRARY_PATH', dirname(realpath(__FILE__)) . '/..');
+
+        // Ensure the library is on include_path
+        set_include_path(implode(PATH_SEPARATOR, array(
+            COUCHLY_LIBRARY_PATH, get_include_path()
+        )));
+
         // Register autoload
         spl_autoload_register('Couchly_Bootstrap::_autoload');
     }
 
     /**
      * Couchly class autoloader
-     * 
+     *
      * @param string $className
      */
     private static function _autoload($className)
