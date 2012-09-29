@@ -21,7 +21,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
      */
     protected $_rev = null;
 
-    public function __constructor($id=null)
+    public function __construct($id=null)
     {
         if (!is_null($id))
         {
@@ -85,8 +85,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                     $className = $calledClass;
                 }
                 
-                $object = new $className;
-                $object->_populate($docValue);
+                $object = new $className($doc->_id);
                 $collObjects[] = $object;
             }
         }
