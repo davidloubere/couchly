@@ -50,12 +50,15 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
           type: int
         field_name_a2:
           type: string
+
     model_name_b:
       fields:
         field_name_b1:
           type: int
         field_name_b2:
           type: string
+        model_name_a:
+          type: stdClass
     ```
 
   - Again, into directory `/PATH/TO/YOUR_APP/CONFIGS`, create a file named `build.yml` defining the properties for build time
