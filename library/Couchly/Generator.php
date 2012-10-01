@@ -7,6 +7,7 @@ class Couchly_Generator
     const PHP_KW_STATIC = 'static';
     const PHP_KW_FUNCTION = 'function';
     const PHP_KW_RETURN = 'return';
+    const PHP_KW_STDCLASS = 'stdClass';
     
     protected $_nl = "\n";
     
@@ -154,6 +155,8 @@ class Couchly_Generator
             {
                 $parentClassName = 'Couchly_Model_Mapper';                
             }
+            
+            // 
             $this->_output[] = "<?php";
             $this->_output[] = "class $className extends $parentClassName";
             $this->_output[] = "{";
@@ -169,12 +172,12 @@ class Couchly_Generator
             /*
              * Class properties
              */
-            
+                        
+            // Fields
             foreach ($modelDefinition->fields as $fieldName => $fieldDefinition)
             {
                 $this->_addClassProperty($fieldName, $fieldDefinition->type, self::PHP_KW_PROTECTED, false, true);
             }
-            
             foreach ($this->_classProperties as $propertyName => $propertyDefinition)
             {
                 $this->_output[] = $this->_computeProperty($propertyName, $propertyDefinition['type'], $propertyDefinition['visibility'], $propertyDefinition['is_static']);
@@ -185,12 +188,19 @@ class Couchly_Generator
              * Class methods
              */
             
-            // Getters
+            // Getters/Setters
             foreach ($this->_classProperties as $propertyName => $propertyDefinition)
             {
+                // Getters
                 if (!$propertyDefinition['is_static'])
                 {
                     $this->_output[] = $this->_computeGetter($propertyName, $propertyDefinition['type'], $propertyDefinition['visibility']);
+                }
+                
+                // Setters
+                if (!$propertyDefinition['is_static'])
+                {
+                    $this->_output[] = $this->_computeSetter($propertyName, $propertyDefinition['type'], $propertyDefinition['visibility']);
                 }
             }
             
@@ -198,17 +208,6 @@ class Couchly_Generator
             $content = $this->_tab . $this->_tab . "return self::MODEL_NAME;";
             $this->_output[] = $this->_computeMethod('getModelName', self::PHP_KW_PUBLIC, false, $content);
             
-            // setData()
-            $content = array();
-            foreach ($this->_classProperties as $propertyName => $propertyDefinition)
-            {
-                if ($propertyDefinition['is_data'])
-                {
-                    $content[] = $this->_tab . $this->_tab . '$this->_' . self::camelize($propertyName) . ' = $data[\'' . $propertyName . '\'];';
-                }
-            }
-            $this->_output[] = $this->_computeMethod('setData', self::PHP_KW_PUBLIC, false, implode($this->_nl, $content), 'array $data');
-
             // save()
             $content = array();
             $content[] = $this->_tab . $this->_tab . "if (\$this->isNew())
@@ -226,28 +225,17 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . "\$doc['data']['" . $propertyName . "'] = " . '$this->_' . self::camelize($propertyName) . ';';
+                    $value = '$this->_' . self::camelize($propertyName);
+                    if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
+                    {
+                        $value = 'get_object_vars(' . $value . ')';
+                    }
+                    $content[] = $this->_tab . $this->_tab . "\$doc['data']['" . $propertyName . "'] = " . $value . ';';
                 }
             }
             $content[] = $this->_tab . $this->_tab;
             $content[] = $this->_tab . $this->_tab . 'self::_getCouchlyFacade()->save($this->_id, $doc);';
             $this->_output[] = $this->_computeMethod('save', self::PHP_KW_PUBLIC, false, implode($this->_nl, $content));
-            
-            // _getData()
-            $content = array();
-            $content[] = $this->_tab . $this->_tab . '$data = array(';
-            $content[] = $this->_tab . $this->_tab . $this->_tab . "'id' => \$this->_id,";
-            $content[] = $this->_tab . $this->_tab . $this->_tab . "'rev' => \$this->_rev,";
-            foreach ($this->_classProperties as $propertyName => $propertyDefinition)
-            {
-                if ($propertyDefinition['is_data'])
-                {
-                    $content[] = $this->_tab . $this->_tab . $this->_tab . "'" . $propertyName . "' => \$this->_" . self::camelize($propertyName) . ',';
-                }
-            }
-            $content[] = $this->_tab . $this->_tab . ');';
-            $content[] = $this->_tab . $this->_tab . 'return $data;';
-            $this->_output[] = $this->_computeMethod('getData', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content));
 
             // _populate()
             $content = array();
@@ -257,7 +245,13 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = \$doc->data->$propertyName;";
+                    $value = "\$doc->data->$propertyName";
+                    if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
+                    {
+                        $objectClassName = $this->_classPrefix . self::camelize($propertyName, false);
+                        $value = 'new ' . $objectClassName . '($doc->_id)';
+                    }
+                    $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = $value;";
                 }
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
@@ -346,6 +340,17 @@ class Couchly_Generator
         return implode($this->_nl, $getter) . $this->_nl;
     }
 
+    protected function _computeSetter($name, $type, $visibility)
+    {
+        $setter = array();
+        $setter[] = $this->_computeDocBlock(array('@param ' . $type));
+        $setter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' set' . self::camelize($name, false) . '($'. self::camelize($name) .')';
+        $setter[] = $this->_tab . '{';
+        $setter[] = $this->_tab . $this->_tab . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::camelize($name) . ' = $'. self::camelize($name) . ';';
+        $setter[] = $this->_tab . '}';
+        return implode($this->_nl, $setter) . $this->_nl;
+    }
+    
     public static function camelize($value, $lcfirst=true)
     {
         $value = preg_replace("/([_-\s]?([a-z0-9]+))/e", "ucwords('\\2')", $value);

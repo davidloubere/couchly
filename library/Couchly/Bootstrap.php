@@ -1,4 +1,5 @@
 <?php
+// TODO: remonter cette classe d'un niveau et la renommer Couchly (ensuite vérifier le include path pour plus de Couchly/..)
 class Couchly_Bootstrap
 {
     private static $_classmap = null;

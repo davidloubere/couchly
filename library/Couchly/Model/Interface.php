@@ -9,13 +9,9 @@ interface Couchly_Model_Interface
     
     public function getRev();
 
-    public function setData(array $data);
-
-    public function assignId($id);
-
     public function save();
 
-    public static function initCouchlyFacade($dbName);
+    public static function initCouchlyFacades(array $databaseMapping);
 
     public static function fetch(array $criteria=null);
     

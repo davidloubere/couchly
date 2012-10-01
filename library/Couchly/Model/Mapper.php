@@ -2,14 +2,9 @@
 abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
 {
     /**
-     * @var Couchly_Facade
+     * @var array
      */
-    private static $_couchlyFacade = null;
-
-    /**
-     * @var string
-     */
-    private static $_dbName = null;
+    private static $_collCouchlyFacades = array();
 
     /**
      * @var int
@@ -35,13 +30,21 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
     }
 
     /**
+     * @param int
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
+    }
+    
+    /**
      * @return int
      */
     public function getId()
     {
         return $this->_id;
     }
-
+    
     /**
      * @return string
      */
@@ -53,11 +56,6 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
     public function isNew()
     {
         return is_null($this->_rev)?true:false;
-    }
-
-    public function assignId($id)
-    {
-        $this->_id = $id;
     }
 
     public static function fetch(array $criteria=null)
@@ -85,7 +83,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                     $className = $calledClass;
                 }
                 
-                $object = new $className($doc->_id);
+                $object = new $className($docValue->_id);
                 $collObjects[] = $object;
             }
         }
@@ -99,21 +97,25 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         self::_getCouchlyFacade()->delete($id, $rev);
     }
 
-    public static function initCouchlyFacade($dbName)
+    public static function initCouchlyFacades(array $databaseMapping)
     {
-        if (is_null(self::$_couchlyFacade))
+        if (empty(self::$_collCouchlyFacades))
         {
-            self::$_couchlyFacade = new Couchly_Facade($dbName);
+            foreach ($databaseMapping as $modelName => $dbName)
+            {
+                self::$_collCouchlyFacades[$modelName] = new Couchly_Facade($dbName);
+            }
         }
         else
         {
-            throw new Couchly_Exception("DB already initialized (db: $dbName)");
+            throw new Couchly_Exception("Facades already initialized");
         }
-
     }
 
     protected static function _getCouchlyFacade()
     {
-        return self::$_couchlyFacade;
+        $calledClass = get_called_class();
+        $modelName = $calledClass::MODEL_NAME;
+        return self::$_collCouchlyFacades[$modelName];
     }
 }
