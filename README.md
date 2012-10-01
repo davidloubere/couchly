@@ -38,18 +38,6 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
     alias couchly-gen=/PATH/TO/COUCHLY/bin/couchly-gen.php
     ```
 
-  - Initialize Couchly into your application (e.g. into your `index.php`)
-
-    ``` 
-    // Include Couchly bootstrap class
-    require_once('/PATH/TO/YOUR_APP/LIB/Couchly/Bootstrap.php');
-
-    // Initialize Couchly
-    Couchly_Bootstrap::init('/PATH/TO/YOUR_APP/CONFIGS/classmap.php');
-    
-    // Add the generated 'classes' directory to the include path
-    set_include_path('/PATH/TO/YOUR_APP/MODELS' . PATH_SEPARATOR . get_include_path());
-    ```
 
 ## Command line usage
 
@@ -90,4 +78,25 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
 
     ```
     $ couchly-gen /PATH/TO/YOUR_APP/CONFIGS/build.yml
+    ```
+    
+## Initialize Couchly into your application
+
+ - Now, to start using Couchly into your application, add the following code (e.g. into your `index.php`)
+ 
+    ``` 
+    // Include Couchly bootstrap class
+    require_once('/PATH/TO/YOUR_APP/LIB/Couchly/Bootstrap.php');
+
+    // Initialize Couchly
+    Couchly_Bootstrap::init('/PATH/TO/YOUR_APP/CONFIGS/classmap.php');
+    
+    // Add the generated 'classes' directory to the include path
+    set_include_path('/PATH/TO/YOUR_APP/MODELS' . PATH_SEPARATOR . get_include_path());
+    
+    // Initialize Couchly facades
+    Couchly_Model_Mapper::initCouchlyFacades(array(
+        Your_App_ModelNameA::MODEL_NAME => 'couchdb_database_a',
+        Your_App_ModelNameB::MODEL_NAME => 'couchdb_database_b'
+    ));
     ```

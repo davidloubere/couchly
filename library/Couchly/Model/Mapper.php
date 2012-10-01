@@ -89,7 +89,6 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         }
 
         return $collObjects;
-
     }
 
     public static function delete($id, $rev)
