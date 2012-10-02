@@ -279,7 +279,7 @@ class Couchly_Generator
                     if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
                     {
                         $objectClassName = $this->_classPrefix . self::camelize($propertyName, false);
-                        $value = 'new ' . $objectClassName . '($doc->_id)';
+                        $value = 'new ' . $objectClassName . '($doc->data->' . $propertyName . '->_id)';
                     }
                     $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = $value;";
                 }
