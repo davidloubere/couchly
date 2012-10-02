@@ -69,19 +69,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
             {
                 $docValue = $doc->value;
                 
-                $calledClass = get_called_class();
-                if (isset($docValue->type))
-                {
-                    $className = str_replace(
-                        substr(strrchr($calledClass, '_'), 1),
-                        Couchly_Generator::camelize($docValue->type, false),
-                        $calledClass
-                    );
-                }
-                else
-                {
-                    $className = $calledClass;
-                }
+                $className = get_called_class();
                 
                 $object = new $className($docValue->_id);
                 $collObjects[] = $object;

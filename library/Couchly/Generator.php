@@ -220,6 +220,8 @@ class Couchly_Generator
             
             // save()
             $content = array();
+            if (!isset($modelDefinition->extends))
+            {
             $content[] = $this->_tab . $this->_tab . "if (\$this->isNew())
         {
             // Create new document
@@ -230,7 +232,8 @@ class Couchly_Generator
             // Update document
             \$doc['_rev'] = \$this->_rev;
         }";
-            $content[] = $this->_tab . $this->_tab;
+                $content[] = $this->_tab . $this->_tab;
+            }
             foreach ($this->_classProperties as $propertyName => $propertyDefinition)
             {
                 if ($propertyDefinition['is_data'])
@@ -240,12 +243,24 @@ class Couchly_Generator
                     {
                         $value = 'get_object_vars(' . $value . ')';
                     }
-                    $content[] = $this->_tab . $this->_tab . "\$doc['data']['" . $propertyName . "'] = " . $value . ';';
+                    $subKey = '';
+                    if (isset($modelDefinition->extends))
+                    {
+                        $subKey = "['" . $modelName . "']";
+                    }
+                    $content[] = $this->_tab . $this->_tab . "\$doc['data']" . $subKey . "['" . $propertyName . "'] = " . $value . ';';
                 }
             }
             $content[] = $this->_tab . $this->_tab;
-            $content[] = $this->_tab . $this->_tab . 'self::_getCouchlyFacade()->save($this->_id, $doc);';
-            $this->_output[] = $this->_computeMethod('save', self::PHP_KW_PUBLIC, false, implode($this->_nl, $content));
+            if (isset($modelDefinition->extends))
+            {
+                $content[] = $this->_tab . $this->_tab . 'parent::save($doc);';
+            }
+            else
+            {
+                $content[] = $this->_tab . $this->_tab . 'self::_getCouchlyFacade()->save($this->_id, $doc);';
+            }   
+            $this->_output[] = $this->_computeMethod('save', self::PHP_KW_PUBLIC, false, implode($this->_nl, $content), 'array $doc=null');
 
             // _populate()
             $content = array();
@@ -255,7 +270,12 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $value = "\$doc->data->$propertyName";
+                    $subKey = '';
+                    if (isset($modelDefinition->extends))
+                    {
+                        $subKey = $modelName . '->';
+                    }
+                    $value = '$doc->data->' . $subKey . $propertyName;
                     if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
                     {
                         $objectClassName = $this->_classPrefix . self::camelize($propertyName, false);
@@ -263,6 +283,10 @@ class Couchly_Generator
                     }
                     $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = $value;";
                 }
+            }
+            if (isset($modelDefinition->extends))
+            {
+                $content[] = $this->_nl . $this->_tab . $this->_tab . 'parent::_populate($doc);';
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
             
