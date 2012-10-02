@@ -166,6 +166,16 @@ class Couchly_Generator
              * Constants
              */
             
+            if (isset($modelDefinition->extends))
+            {
+                $facadeModelName = $modelDefinition->extends;
+            }
+            else
+            {
+                $facadeModelName = $modelName;
+            }
+            $this->_output[] = $this->_computeConstant('FACADE_MODEL_NAME', "'" . $facadeModelName . "'", array('Model name for initializing facade'));
+            
             $this->_output[] = $this->_computeConstant('MODEL_NAME', "'" . $modelName . "'", array('Model name'));
             
             

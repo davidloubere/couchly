@@ -113,8 +113,19 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
 
     protected static function _getCouchlyFacade()
     {
+        $couhlyFacade = null;
+        
         $calledClass = get_called_class();
-        $modelName = $calledClass::MODEL_NAME;
-        return self::$_collCouchlyFacades[$modelName];
+        $modelName = $calledClass::FACADE_MODEL_NAME;
+        if (array_key_exists($modelName, self::$_collCouchlyFacades))
+        {
+            $couhlyFacade = self::$_collCouchlyFacades[$modelName];
+        }
+        else
+        {
+            throw new Couchly_Exception("Unable to retrieve facade for model '$modelName'");
+        }
+
+        return $couhlyFacade;
     }
 }
