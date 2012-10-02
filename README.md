@@ -56,9 +56,17 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
         field_name_b1:
           type: int
         field_name_b2:
-          type: string
-        model_name_a:
+          type: int
+        model_name_a:    # 'model_name_b' embeds a 'model_name_a' object
           type: stdClass
+
+    model_name_c:
+      extends: model_name_a    # 'model_name_c' extends 'model_name_a'
+      fields:
+        field_name_c1:
+          type: string
+        field_name_c2:
+          type: string
     ```
 
   - Again, into directory `/PATH/TO/YOUR_APP/CONFIGS`, create a file named `build.yml` defining the properties for build time
@@ -99,7 +107,7 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
     
     // Initialize Couchly facades
     Couchly_Model_Mapper::initCouchlyFacades(array(
-        Your_App_ModelNameA::MODEL_NAME => 'couchdb_database_a',
-        Your_App_ModelNameB::MODEL_NAME => 'couchdb_database_b'
+        Your_App_ModelNameA::FACADE_MODEL_NAME => 'couchdb_database_a',
+        Your_App_ModelNameB::FACADE_MODEL_NAME => 'couchdb_database_b'
     ));
     ```
