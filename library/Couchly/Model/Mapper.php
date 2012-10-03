@@ -71,6 +71,8 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 
                 $className = get_called_class();
                 
+                $object = null;
+                
                 if (method_exists($className, 'getChildMap'))
                 {
                     $childs = $className::getChildMap();
@@ -86,6 +88,11 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 else
                 {
                     $object = new $className($docValue->_id);
+                }
+                
+                if (is_null($object))
+                {
+                    throw new Couchly_Exception("Unable to determine model object for document (id=$docValue->_id, rev=$docValue->_rev)");
                 }
                 
                 $collObjects[] = $object;

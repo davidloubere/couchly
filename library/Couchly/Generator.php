@@ -173,9 +173,16 @@ class Couchly_Generator
                 $parentClassName = 'Couchly_Model_Mapper';                
             }
             
+            // Abstract
+            $abstract = '';
+            if ($this->_isParentModel($modelName))
+            {
+                $abstract = 'abstract ';
+            }
+            
             // 
             $this->_output[] = "<?php";
-            $this->_output[] = "class $className extends $parentClassName";
+            $this->_output[] = $abstract . "class $className extends $parentClassName";
             $this->_output[] = "{";
 
 
@@ -308,22 +315,19 @@ class Couchly_Generator
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
             
             // getChildMap()
-            if (!isset($modelDefinition->extends))
+            if ($this->_isParentModel($modelName))
             {
-                if (array_key_exists($modelName, $this->_childMap))
+                $content = array();
+                $content[] = $this->_tab . $this->_tab . 'return array(';
+                $lines = array();
+                foreach ($this->_childMap[$modelName] as $childModelName)
                 {
-                    $content = array();
-                    $content[] = $this->_tab . $this->_tab . 'return array(';
-                    $lines = array();
-                    foreach ($this->_childMap[$modelName] as $childModelName)
-                    {
-                        $childClassName = $this->_classPrefix . self::camelize($childModelName, false);
-                        $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $childClassName ."'";
-                    }
-                    $content[] = implode(',' . $this->_nl, $lines);
-                    $content[] = $this->_tab . $this->_tab . ');';
-                    $this->_output[] = $this->_computeMethod('getChildMap', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content));
+                    $childClassName = $this->_classPrefix . self::camelize($childModelName, false);
+                    $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $childClassName ."'";
                 }
+                $content[] = implode(',' . $this->_nl, $lines);
+                $content[] = $this->_tab . $this->_tab . ');';
+                $this->_output[] = $this->_computeMethod('getChildMap', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content));
             }
             
             
@@ -349,6 +353,11 @@ class Couchly_Generator
          */
         
         $this->_writeClassmap();
+    }
+    
+    protected function _isParentModel($modelName)
+    {
+        return (!isset($modelDefinition->extends) && array_key_exists($modelName, $this->_childMap));
     }
     
     protected function _addClassProperty($name, $type, $visibility, $isStatic=false, $isData=false)
