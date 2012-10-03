@@ -17,6 +17,8 @@ class Couchly_Generator
     
     protected $_dirModel = null;
     
+    protected $_schema = null;
+    
     protected $_classPath = '';
     
     protected $_classPrefix = '';
@@ -24,6 +26,8 @@ class Couchly_Generator
     protected $_classProperties = array();
     
     protected $_classMap = array();
+    
+    protected $_childMap = array();
     
     protected $_output = array();
     
@@ -59,7 +63,11 @@ class Couchly_Generator
                 $this->_classPrefix = $configBuild->class->prefix;
             }
             
+            $this->_schema = new Zend_Config_Yaml($this->_dirConfig . '/schema.yml');
+            
             header('Content-Type: text/plain');
+            
+            $this->_prepare();
             
             $this->_generate();
             
@@ -132,11 +140,20 @@ class Couchly_Generator
         return $this->_classPrefix . self::camelize($modelName, false);
     }
     
+    protected function _prepare()
+    {
+        foreach ($this->_schema as $modelName => $modelDefinition)
+        {
+            if (isset($modelDefinition->extends))
+            {
+                $this->_childMap[$modelDefinition->extends][] = $modelName;
+            }
+        }
+    }
+    
     protected function _generate()
     {
-        $schemaConfig = new Zend_Config_Yaml($this->_dirConfig . '/schema.yml');
-        
-        foreach ($schemaConfig as $modelName => $modelDefinition)
+        foreach ($this->_schema  as $modelName => $modelDefinition)
         {
             $this->_log('Creating model: ' . $modelName, false);
             
@@ -289,6 +306,25 @@ class Couchly_Generator
                 $content[] = $this->_nl . $this->_tab . $this->_tab . 'parent::_populate($doc);';
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
+            
+            // getChildMap()
+            if (!isset($modelDefinition->extends))
+            {
+                if (array_key_exists($modelName, $this->_childMap))
+                {
+                    $content = array();
+                    $content[] = $this->_tab . $this->_tab . 'return array(';
+                    $lines = array();
+                    foreach ($this->_childMap[$modelName] as $childModelName)
+                    {
+                        $childClassName = $this->_classPrefix . self::camelize($childModelName, false);
+                        $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $childClassName ."'";
+                    }
+                    $content[] = implode(',' . $this->_nl, $lines);
+                    $content[] = $this->_tab . $this->_tab . ');';
+                    $this->_output[] = $this->_computeMethod('getChildMap', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content));
+                }
+            }
             
             
             /*

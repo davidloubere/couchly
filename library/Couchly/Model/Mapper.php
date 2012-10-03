@@ -71,7 +71,23 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 
                 $className = get_called_class();
                 
-                $object = new $className($docValue->_id);
+                if (method_exists($className, 'getChildMap'))
+                {
+                    $childs = $className::getChildMap();
+                    foreach ($childs as $childModelName => $childClassName)
+                    {
+                        if (array_key_exists($childModelName, $docValue->data))
+                        {
+                            $object = new $childClassName($docValue->_id);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $object = new $className($docValue->_id);
+                }
+                
                 $collObjects[] = $object;
             }
         }
