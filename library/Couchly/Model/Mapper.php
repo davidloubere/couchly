@@ -92,7 +92,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 
                 if (is_null($object))
                 {
-                    throw new Couchly_Exception("Unable to determine model object for document (id=$docValue->_id, rev=$docValue->_rev)");
+                    throw new Couchly_Exception("Unable to determine model object for document (id: $docValue->_id, rev: $docValue->_rev)");
                 }
                 
                 $collObjects[] = $object;
@@ -102,6 +102,24 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         return $collObjects;
     }
 
+    public static function findById($id)
+    {
+        $object = null;
+        
+        $criteria = array(
+            'condition' => array(
+                array('_id', "'$id'", '===')
+            )
+        );
+        $collObjects = self::fetch($criteria);
+        if (!empty($collObjects) && count($collObjects) === 1)
+        {
+            $object = $collObjects[0];
+        }
+        
+        return $object;
+    }
+    
     public static function delete($id, $rev)
     {
         self::_getCouchlyFacade()->delete($id, $rev);

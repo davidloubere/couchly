@@ -15,5 +15,7 @@ interface Couchly_Model_Interface
 
     public static function fetch(array $criteria=null);
     
+    public static function findById($id);
+    
     public static function delete($id, $rev);
 }
