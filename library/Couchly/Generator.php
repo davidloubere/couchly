@@ -314,7 +314,7 @@ class Couchly_Generator
             }
             $this->_output[] = $this->_computeMethod('populate', self::PHP_KW_PROTECTED, false, implode($this->_nl, $content), 'stdClass $doc');            
             
-            // getChildMap()
+            // _getChildMap()
             if ($this->_isParentModel($modelName))
             {
                 $content = array();
@@ -327,7 +327,7 @@ class Couchly_Generator
                 }
                 $content[] = implode(',' . $this->_nl, $lines);
                 $content[] = $this->_tab . $this->_tab . ');';
-                $this->_output[] = $this->_computeMethod('getChildMap', self::PHP_KW_PUBLIC, true, implode($this->_nl, $content));
+                $this->_output[] = $this->_computeMethod('getChildMap', self::PHP_KW_PROTECTED, true, implode($this->_nl, $content));
             }
             
             

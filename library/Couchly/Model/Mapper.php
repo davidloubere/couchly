@@ -58,6 +58,19 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         return is_null($this->_rev)?true:false;
     }
 
+    public function toArray()
+    {
+        $arr = array();
+        
+        $vars = get_object_vars($this);
+        foreach ($vars as $k => $v)
+        {
+            $arr[preg_replace('/^_/', '', $k)] = $v;
+        }
+        
+        return $arr;
+    }
+    
     public static function fetch(array $criteria=null)
     {
         $collObjects = array();
@@ -73,9 +86,9 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 
                 $object = null;
                 
-                if (method_exists($className, 'getChildMap'))
+                if (method_exists($className, '_getChildMap'))
                 {
-                    $childs = $className::getChildMap();
+                    $childs = $className::_getChildMap();
                     foreach ($childs as $childModelName => $childClassName)
                     {
                         if (array_key_exists($childModelName, $docValue->data))
