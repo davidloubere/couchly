@@ -26,6 +26,7 @@ class Couchly_Facade
         $sVar = '';
         $sCondition = '';
         $sKey = 'doc._id';
+        $sOrder = '';
         
         if (!is_null($criteria))
         {
@@ -64,6 +65,19 @@ class Couchly_Facade
                 }
                 $sKey = '['.implode(', ', $aKey).']';
             }
+            
+            // Fetch order
+            if (array_key_exists('order', $criteria))
+            {
+                if ($criteria['order'] === 'ASC')
+                {
+                    $sOrder = '?descending=false';
+                }
+                elseif ($criteria['order'] === 'DESC')
+                {
+                    $sOrder = '?descending=true';
+                }
+            }
         }
         
         if (isset($aCondition) && !empty($aCondition))
@@ -76,7 +90,7 @@ class Couchly_Facade
         }
         
         $viewDefinition = array('map' => $map);
-        return $this->_couchlyClient->post($viewDefinition, '_temp_view?descending=true');
+        return $this->_couchlyClient->post($viewDefinition, '_temp_view' . $sOrder);
     }
 
     public function save($id, $doc)
