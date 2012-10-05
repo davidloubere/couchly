@@ -93,14 +93,16 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                     {
                         if (array_key_exists($childModelName, $docValue->data))
                         {
-                            $object = new $childClassName($docValue->_id);
+                            $object = new $childClassName();
+                            $object->_populate($docValue);
                             break;
                         }
                     }
                 }
                 else
                 {
-                    $object = new $className($docValue->_id);
+                    $object = new $className();
+                    $object->_populate($docValue);
                 }
                 
                 if (is_null($object))
