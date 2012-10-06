@@ -299,12 +299,14 @@ class Couchly_Generator
                     {
                         $subKey = $modelName . '->';
                     }
-                    $value = '$doc->data->' . $subKey . $propertyName;
+                    $var = $value = '$doc->data->' . $subKey . $propertyName;
                     if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
                     {
                         $objectClassName = $this->_classPrefix . self::camelize($propertyName, false);
-                        $value = 'new ' . $objectClassName . '($doc->data->' . $propertyName . '->_id)';
+                        $var = '$doc->data->' . $propertyName . '->_id';
+                        $value = 'new ' . $objectClassName . '(' . $var . ')';
                     }
+                    $value = 'isset(' . $var .') ? ' . $value . ' : null';
                     $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = $value;";
                 }
             }
