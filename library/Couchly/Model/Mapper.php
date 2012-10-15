@@ -65,7 +65,8 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         $vars = get_object_vars($this);
         foreach ($vars as $k => $v)
         {
-            $arr[preg_replace('/^_/', '', $k)] = $v;
+            $k = preg_replace('/^_/', '', Couchly_Utils::decamelize($k));
+            $arr[$k] = $v;
         }
         
         return $arr;
