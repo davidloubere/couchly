@@ -81,7 +81,7 @@ class Couchly_Generator
     
     protected function _writeModel($modelName)
     {
-        $fileName = self::camelize($modelName, false) . '.php';
+        $fileName = Couchly_Utils::camelize($modelName, false) . '.php';
         $className = $this->_computeClassName($modelName);
         
         $this->_classMap[$className] = empty($this->_classPath) ? $fileName : $this->_classPath . '/' . $fileName;
@@ -137,7 +137,7 @@ class Couchly_Generator
     
     protected function _computeClassName($modelName)
     {
-        return $this->_classPrefix . self::camelize($modelName, false);
+        return $this->_classPrefix . Couchly_Utils::camelize($modelName, false);
     }
     
     protected function _prepare()
@@ -166,7 +166,7 @@ class Couchly_Generator
             // Inheritance
             if (isset($modelDefinition->extends))
             {
-                $parentClassName = $this->_classPrefix . self::camelize($modelDefinition->extends, false);
+                $parentClassName = $this->_classPrefix . Couchly_Utils::camelize($modelDefinition->extends, false);
             }
             else
             {
@@ -262,7 +262,7 @@ class Couchly_Generator
             {
                 if ($propertyDefinition['is_data'])
                 {
-                    $value = '$this->_' . self::camelize($propertyName);
+                    $value = '$this->_' . Couchly_Utils::camelize($propertyName);
                     if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
                     {
                         $value = 'get_object_vars(' . $value . ')';
@@ -302,12 +302,12 @@ class Couchly_Generator
                     $var = $value = '$doc->data->' . $subKey . $propertyName;
                     if ($propertyDefinition['type'] === self::PHP_KW_STDCLASS)
                     {
-                        $objectClassName = $this->_classPrefix . self::camelize($propertyName, false);
+                        $objectClassName = $this->_classPrefix . Couchly_Utils::camelize($propertyName, false);
                         $var = '$doc->data->' . $propertyName . '->_id';
                         $value = 'new ' . $objectClassName . '(' . $var . ')';
                     }
                     $value = 'isset(' . $var .') ? ' . $value . ' : null';
-                    $content[] = $this->_tab . $this->_tab . "\$this->_" . self::camelize($propertyName) . " = $value;";
+                    $content[] = $this->_tab . $this->_tab . "\$this->_" . Couchly_Utils::camelize($propertyName) . " = $value;";
                 }
             }
             if (isset($modelDefinition->extends))
@@ -324,7 +324,7 @@ class Couchly_Generator
                 $lines = array();
                 foreach ($this->_childMap[$modelName] as $childModelName)
                 {
-                    $childClassName = $this->_classPrefix . self::camelize($childModelName, false);
+                    $childClassName = $this->_classPrefix . Couchly_Utils::camelize($childModelName, false);
                     $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $childClassName ."'";
                 }
                 $content[] = implode(',' . $this->_nl, $lines);
@@ -396,7 +396,7 @@ class Couchly_Generator
     {
         $property = array();
         $property[] = $this->_computeDocBlock(array('@var ' . $type));
-        $property[] = $this->_tab . $visibility . ' ' . ($isStatic ? self::PHP_KW_STATIC . ' ' : '') . ($visibility === self::PHP_KW_PUBLIC ? '$' : '$_') . self::camelize($name) . ' = null;';
+        $property[] = $this->_tab . $visibility . ' ' . ($isStatic ? self::PHP_KW_STATIC . ' ' : '') . ($visibility === self::PHP_KW_PUBLIC ? '$' : '$_') . Couchly_Utils::camelize($name) . ' = null;';
         return implode($this->_nl, $property) . $this->_nl;
     }
     
@@ -414,9 +414,9 @@ class Couchly_Generator
     {
         $getter = array();
         $getter[] = $this->_computeDocBlock(array('@return ' . $type));
-        $getter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' get' . self::camelize($name, false) . '()';
+        $getter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' get' . Couchly_Utils::camelize($name, false) . '()';
         $getter[] = $this->_tab . '{';
-        $getter[] = $this->_tab . $this->_tab . self::PHP_KW_RETURN . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::camelize($name) . ';';
+        $getter[] = $this->_tab . $this->_tab . self::PHP_KW_RETURN . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . Couchly_Utils::camelize($name) . ';';
         $getter[] = $this->_tab . '}';
         return implode($this->_nl, $getter) . $this->_nl;
     }
@@ -425,16 +425,10 @@ class Couchly_Generator
     {
         $setter = array();
         $setter[] = $this->_computeDocBlock(array('@param ' . $type));
-        $setter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' set' . self::camelize($name, false) . '($'. self::camelize($name) .')';
+        $setter[] = $this->_tab . self::PHP_KW_PUBLIC . ' ' . self::PHP_KW_FUNCTION . ' set' . Couchly_Utils::camelize($name, false) . '($'. Couchly_Utils::camelize($name) .')';
         $setter[] = $this->_tab . '{';
-        $setter[] = $this->_tab . $this->_tab . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . self::camelize($name) . ' = $'. self::camelize($name) . ';';
+        $setter[] = $this->_tab . $this->_tab . ' $this->' . ($visibility === self::PHP_KW_PUBLIC ? '' : '_') . Couchly_Utils::camelize($name) . ' = $'. Couchly_Utils::camelize($name) . ';';
         $setter[] = $this->_tab . '}';
         return implode($this->_nl, $setter) . $this->_nl;
-    }
-    
-    public static function camelize($value, $lcfirst=true)
-    {
-        $value = preg_replace("/([_-\s]?([a-z0-9]+))/e", "ucwords('\\2')", $value);
-        return ($lcfirst ? strtolower($value[0]) : strtoupper($value[0])) . substr($value, 1);
     }
 }
