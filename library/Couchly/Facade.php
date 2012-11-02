@@ -26,7 +26,7 @@ class Couchly_Facade
         $sVar = '';
         $sCondition = '';
         $sKey = 'doc._id';
-        $sOrder = '';
+        $params = array();
         
         if (!is_null($criteria))
         {
@@ -71,13 +71,31 @@ class Couchly_Facade
             {
                 if ($criteria['order'] === 'ASC')
                 {
-                    $sOrder = '?descending=false';
+                    $params['descending'] = 'false';
                 }
                 elseif ($criteria['order'] === 'DESC')
                 {
-                    $sOrder = '?descending=true';
+                    $params['descending'] = 'true';
                 }
             }
+            
+            // Fetch limit
+            if (array_key_exists('limit', $criteria))
+            {
+                $params['limit'] = $criteria['limit'];
+            }
+        }
+        
+        // Builds params string
+        $sParams = '';
+        if (!empty($params))
+        {
+            $sParams = '?';
+            foreach ($params as $kParam => $vParam)
+            {
+                $sParams .= $kParam . '=' . $vParam . '&';
+            }
+            $sParams = substr($sParams, 0, -1);
         }
         
         if (isset($aCondition) && !empty($aCondition))
@@ -90,7 +108,7 @@ class Couchly_Facade
         }
         
         $viewDefinition = array('map' => $map);
-        return $this->_couchlyClient->post($viewDefinition, '_temp_view' . $sOrder);
+        return $this->_couchlyClient->post($viewDefinition, '_temp_view' . $sParams);
     }
 
     public function save($id, $doc)
