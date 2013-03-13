@@ -1,5 +1,8 @@
 <?php
-class Couchly_Utils
+
+namespace Couchly;
+
+class Utils
 {
     public static function camelize($value, $lcfirst=true)
     {

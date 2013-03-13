@@ -1,5 +1,8 @@
 <?php
-abstract class Couchly_Model_Abstract implements Couchly_Model_Interface
+
+namespace Couchly\Model;
+
+abstract class AbstractMapper implements InterfaceMapper
 {
     abstract protected function _populate(stdClass $doc);
 

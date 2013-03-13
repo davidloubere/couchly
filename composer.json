@@ -1,0 +1,13 @@
+{
+    "name": "couchly/couchly",
+    "description": "Simple CouchDB object-document mapper",
+    "license": "",
+    "keywords": [
+        "couchdb",
+        "odm"
+    ],
+    "homepage": "https://github.com/davidloubere/couchly/",
+    "require": {
+        "zendframework/zend-http": "2.*"
+    }
+}

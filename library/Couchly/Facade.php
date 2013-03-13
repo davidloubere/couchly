@@ -1,19 +1,19 @@
 <?php
-/**
- * Couchly_Facade
- * 
- * @link    http://github.com/davidloubere/couchly for the canonical source repository
- */
-class Couchly_Facade
+
+namespace Couchly;
+
+use Couchly\Client;
+
+class Facade
 {
     /**
-     * @var Couchly_Client
+     * @var \Couchly\Client
      */
     protected $_couchlyClient = null;
 
     public function __construct($dbName, $host='localhost', $port=5984)
     {
-        $this->_couchlyClient = new Couchly_Client($dbName, $host, $port);
+        $this->_couchlyClient = new Client($dbName, $host, $port);
     }
     
     public function retrieve($id)

@@ -1,5 +1,8 @@
 <?php
-interface Couchly_Model_Interface
+
+namespace Couchly\Model;
+
+interface InterfaceMapper
 {
     public function isNew();
 

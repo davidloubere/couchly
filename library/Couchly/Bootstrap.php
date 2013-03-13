@@ -1,6 +1,8 @@
 <?php
-// TODO: remonter cette classe d'un niveau et la renommer Couchly (ensuite vérifier le include path pour plus de Couchly/..)
-class Couchly_Bootstrap
+
+namespace Couchly;
+
+class Bootstrap
 {
     private static $_classmap = null;
 
@@ -23,8 +25,11 @@ class Couchly_Bootstrap
             COUCHLY_LIBRARY_PATH, get_include_path()
         )));
 
+        // Adds composer autoload
+        require(COUCHLY_LIBRARY_PATH . '/../vendor/autoload.php');
+
         // Register autoload
-        spl_autoload_register('Couchly_Bootstrap::_autoload');
+        spl_autoload_register('\Couchly\Bootstrap::_autoload');
     }
 
     /**
@@ -34,10 +39,10 @@ class Couchly_Bootstrap
      */
     private static function _autoload($className)
     {
-        if (preg_match('/^Couchly|^Zend/', $className))
+        require_once(str_replace('\\', '/', $className . '.php'));
+        /*if (preg_match('/^Couchly/', $className))
         {
-            // Autoloading through symlink
-            require_once(str_replace('_', '/', $className . '.php'));
+            require_once(str_replace('\\', '/', $className . '.php'));
         }
         elseif (!is_null(self::$_classmap) && array_key_exists($className, self::$_classmap))
         {
@@ -55,7 +60,7 @@ class Couchly_Bootstrap
                     }
                 }
             }
-        }
+        }*/
     }
 }
 ?>

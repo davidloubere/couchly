@@ -1,4 +1,9 @@
 <?php
+
+use Couchly\Bootstrap;
+use Couchly\Exception;
+use Couchly\Facade;
+
 /**
  * Demo facade
  * 
@@ -9,10 +14,10 @@
 require_once(dirname(realpath(__FILE__)) . '/../library/Couchly/Bootstrap.php');
 
 // Initialize Couchly
-Couchly_Bootstrap::init();
+Bootstrap::init();
 
 // Instantiate a Couchly facade
-$couchlyFacade = new Couchly_Facade('db_demo1');
+$couchlyFacade = new Facade('db_demo1');
 
 try
 {
@@ -72,7 +77,7 @@ try
         {
             echo "Document retrieved (id=$id)";
             echo "<pre>";
-            var_dump($document);
+            print_r($document);
             echo "</pre>";
             
             // Delete the document
@@ -82,7 +87,7 @@ try
         echo "<br>";
     }
 }
-catch (Couchly_Exception $ce)
+catch (Exception $ce)
 {
     die($ce->getMessage());
 }

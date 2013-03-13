@@ -1,5 +1,12 @@
 <?php
-abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
+
+namespace Couchly\Model;
+
+use Couchly\Exception;
+use Couchly\Facade;
+use Couchly\Utils;
+
+abstract class Mapper extends AbstractMapper
 {
     /**
      * @var array
@@ -23,7 +30,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
             $doc = self::_getCouchlyFacade()->retrieve($id);
             if (is_null($doc))
             {
-                throw new Couchly_Exception("Document not found (id: $id)");
+                throw new Exception("Document not found (id: $id)");
             }
             $this->_populate($doc);
         }
@@ -65,7 +72,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         $vars = get_object_vars($this);
         foreach ($vars as $k => $v)
         {
-            $k = preg_replace('/^_/', '', Couchly_Utils::decamelize($k));
+            $k = preg_replace('/^_/', '', Utils::decamelize($k));
             $arr[$k] = $v;
         }
         
@@ -108,7 +115,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
                 
                 if (is_null($object))
                 {
-                    throw new Couchly_Exception("Unable to determine model object for document (id: $docValue->_id, rev: $docValue->_rev)");
+                    throw new Exception("Unable to determine model object for document (id: $docValue->_id, rev: $docValue->_rev)");
                 }
                 
                 $collObjects[] = $object;
@@ -147,12 +154,12 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         {
             foreach ($databaseMapping as $modelName => $dbName)
             {
-                self::$_collCouchlyFacades[$modelName] = new Couchly_Facade($dbName);
+                self::$_collCouchlyFacades[$modelName] = new Facade($dbName);
             }
         }
         else
         {
-            throw new Couchly_Exception("Facades already initialized");
+            throw new Exception("Facades already initialized");
         }
     }
 
@@ -168,7 +175,7 @@ abstract class Couchly_Model_Mapper extends Couchly_Model_Abstract
         }
         else
         {
-            throw new Couchly_Exception("Unable to retrieve facade for model '$modelName'");
+            throw new Exception("Unable to retrieve facade for model '$modelName'");
         }
 
         return $couhlyFacade;

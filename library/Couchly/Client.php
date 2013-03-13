@@ -1,10 +1,7 @@
 <?php
-/**
- * Couchly_Client
- * 
- * @link    http://github.com/davidloubere/couchly for the canonical source repository
- */
-class Couchly_Client
+namespace Couchly;
+
+class Client
 {
     const
         STATUS_GET_SUCCESS = 200,
@@ -28,7 +25,7 @@ class Couchly_Client
     {
         $doc = null;
         $response = $this->_request($this->_computeUri($id), 'GET');
-        if ($response->getStatus() === self::STATUS_GET_SUCCESS)
+        if ($response->getStatusCode() === self::STATUS_GET_SUCCESS)
         {
             $doc = json_decode($response->getBody());
         }
@@ -39,7 +36,7 @@ class Couchly_Client
     {
         $response = $this->_request($this->_computeUri($extraUri), 'POST', $doc, 'application/json');
         $body = json_decode($response->getBody());
-        if ($response->getStatus() !== self::STATUS_POST_SUCCESS)
+        if ($response->getStatusCode() !== self::STATUS_POST_SUCCESS)
         {
             throw new Couchly_Exception($body->error.': '.$body->reason);
         }
@@ -49,7 +46,7 @@ class Couchly_Client
     public function put($id, $doc)
     {
         $response = $this->_request($this->_computeUri($id), 'PUT', $doc, 'application/json');
-        if ($response->getStatus() !== self::STATUS_PUT_SUCCESS)
+        if ($response->getStatusCode() !== self::STATUS_PUT_SUCCESS)
         {
             $body = json_decode($response->getBody());
             throw new Couchly_Exception($body->error.': '.$body->reason);
@@ -59,7 +56,7 @@ class Couchly_Client
     public function delete($id, $rev)
     {
         $response = $this->_request($this->_computeUri($id.'?rev='.$rev), 'DELETE');
-        if ($response->getStatus() !== self::STATUS_DELETE_SUCCESS)
+        if ($response->getStatusCode() !== self::STATUS_DELETE_SUCCESS)
         {
             $body = json_decode($response->getBody());
             throw new Couchly_Exception($body->error.': '.$body->reason);
@@ -68,13 +65,15 @@ class Couchly_Client
     
     protected function _request($uri, $method, $data=null, $enctype=null)
     {
-        $client = new Zend_Http_Client();
+        $client = new \Zend\Http\Client();
         $client->setUri($uri);
         if (!is_null($data))
         {
-            $client->setRawData(json_encode($data), $enctype);
+            $client->setEncType($enctype);
+            $client->setRawBody(json_encode($data));
         }
-        return $client->request($method);
+        $client->setMethod($method);
+        return $client->send();
     }
     
     protected function _computeUri($extraUri=null)
