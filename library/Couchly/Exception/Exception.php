@@ -1,6 +1,6 @@
 <?php
 
-namespace Couchly;
+namespace Couchly\Exception;
 
 class Exception extends \Exception
 {

@@ -2,7 +2,7 @@
 
 namespace Couchly;
 
-use Couchly\Exception;
+use Couchly\Exception\Exception;
 
 class Utils
 {

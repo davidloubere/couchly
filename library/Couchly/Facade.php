@@ -28,25 +28,20 @@ class Facade
         $sKey = 'doc._id';
         $params = array();
         
-        if (!is_null($criteria))
-        {
+        if (!is_null($criteria)) {
             // Variables definition
-            if (array_key_exists('var', $criteria))
-            {
+            if (array_key_exists('var', $criteria)) {
                 $aVar = array();
-                foreach ($criteria['var'] as $name => $value)
-                {
+                foreach ($criteria['var'] as $name => $value) {
                     $aVar[] = "doc.$name = $value;";
                 }
                 $sVar = implode($aVar);
             }
             
             // Fetch condition
-            if (array_key_exists('condition', $criteria))
-            {
+            if (array_key_exists('condition', $criteria)) {
                 $aCondition = array();
-                foreach ($criteria['condition'] as $condition)
-                {
+                foreach ($criteria['condition'] as $condition) {
                     $left = $condition[0];
                     $right = $condition[1];
                     $operator = isset($condition[2])?$condition[2]:'==';
@@ -56,54 +51,44 @@ class Facade
             }
             
             // Fetch key
-            if (array_key_exists('key', $criteria))
-            {
+            if (array_key_exists('key', $criteria)) {
                 $aKey = array();
-                foreach ($criteria['key'] as $key)
-                {
+                foreach ($criteria['key'] as $key) {
                     $aKey[] = "doc.$key"; 
                 }
                 $sKey = '['.implode(', ', $aKey).']';
             }
             
             // Fetch order
-            if (array_key_exists('order', $criteria))
-            {
-                if ($criteria['order'] === 'ASC')
-                {
+            if (array_key_exists('order', $criteria)) {
+                if ($criteria['order'] === 'ASC') {
                     $params['descending'] = 'false';
                 }
-                elseif ($criteria['order'] === 'DESC')
-                {
+                elseif ($criteria['order'] === 'DESC') {
                     $params['descending'] = 'true';
                 }
             }
             
             // Fetch limit
-            if (array_key_exists('limit', $criteria))
-            {
+            if (array_key_exists('limit', $criteria)) {
                 $params['limit'] = $criteria['limit'];
             }
         }
         
         // Builds params string
         $sParams = '';
-        if (!empty($params))
-        {
+        if (!empty($params)) {
             $sParams = '?';
-            foreach ($params as $kParam => $vParam)
-            {
+            foreach ($params as $kParam => $vParam) {
                 $sParams .= $kParam . '=' . $vParam . '&';
             }
             $sParams = substr($sParams, 0, -1);
         }
         
-        if (isset($aCondition) && !empty($aCondition))
-        {
+        if (isset($aCondition) && !empty($aCondition)) {
             $map = 'function(doc) {if ('.$sCondition.') {'.$sVar.'emit('.$sKey.', doc);}}';
         }
-        else
-        {
+        else {
             $map = 'function(doc) {'.$sVar.'emit('.$sKey.', doc);}';
         }
         

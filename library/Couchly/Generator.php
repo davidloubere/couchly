@@ -2,7 +2,7 @@
 
 namespace Couchly;
 
-use Couchly\Exception;
+use Couchly\Exception\GeneratorException;
 use Couchly\Utils;
 use Symfony\Component\Yaml\Yaml;
 
@@ -69,9 +69,9 @@ class Generator
             $this->_generate();
             $this->_log('Done!');
         }
-        catch(Exception $ce)
+        catch(GeneratorException $cge)
         {
-            die($ce->getMessage() . $this->_nl);
+            die($cge->getMessage() . $this->_nl);
         }
     }
     

@@ -40,27 +40,6 @@ class Bootstrap
     private static function _autoload($className)
     {
         require_once(str_replace('\\', '/', $className . '.php'));
-        /*if (preg_match('/^Couchly/', $className))
-        {
-            require_once(str_replace('\\', '/', $className . '.php'));
-        }
-        elseif (!is_null(self::$_classmap) && array_key_exists($className, self::$_classmap))
-        {
-            // Autoloading through classmap
-            $includePath = explode(PATH_SEPARATOR, get_include_path());
-            if (!empty($includePath))
-            {
-                foreach ($includePath as $path)
-                {
-                    $file = $path . '/' . self::$_classmap[$className];
-                    if (is_readable($file))
-                    {
-                        require_once($file);
-                        break;
-                    }
-                }
-            }
-        }*/
     }
 }
 ?>

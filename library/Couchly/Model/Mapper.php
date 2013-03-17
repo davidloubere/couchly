@@ -2,7 +2,7 @@
 
 namespace Couchly\Model;
 
-use Couchly\Exception;
+use Couchly\Exception\MapperException;
 use Couchly\Facade;
 use Couchly\Utils;
 
@@ -30,7 +30,7 @@ abstract class Mapper extends AbstractMapper
             $doc = self::_getCouchlyFacade()->retrieve($id);
             if (is_null($doc))
             {
-                throw new Exception("Document not found (id: $id)");
+                throw new MapperException("Document not found (id: $id)");
             }
             $this->_populate($doc);
         }
@@ -115,7 +115,7 @@ abstract class Mapper extends AbstractMapper
                 
                 if (is_null($object))
                 {
-                    throw new Exception("Unable to determine model object for document (id: $docValue->_id, rev: $docValue->_rev)");
+                    throw new MapperException("Unable to determine model object for document (id: $docValue->_id, rev: $docValue->_rev)");
                 }
                 
                 $collObjects[] = $object;
@@ -159,7 +159,7 @@ abstract class Mapper extends AbstractMapper
         }
         else
         {
-            throw new Exception("Facades already initialized");
+            throw new MapperException("Facades already initialized");
         }
     }
 
@@ -175,7 +175,7 @@ abstract class Mapper extends AbstractMapper
         }
         else
         {
-            throw new Exception("Unable to retrieve facade for model '$modelName'");
+            throw new MapperException("Unable to retrieve facade for model '$modelName'");
         }
 
         return $couhlyFacade;

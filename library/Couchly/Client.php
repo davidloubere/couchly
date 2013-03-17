@@ -1,6 +1,8 @@
 <?php
 namespace Couchly;
 
+use Couchly\Exception\ClientException;
+
 class Client
 {
     const
@@ -38,7 +40,7 @@ class Client
         $body = json_decode($response->getBody());
         if ($response->getStatusCode() !== self::STATUS_POST_SUCCESS)
         {
-            throw new Couchly_Exception($body->error.': '.$body->reason);
+            throw new ClientException($body->error.': '.$body->reason);
         }
         return $body;
     }
@@ -49,7 +51,7 @@ class Client
         if ($response->getStatusCode() !== self::STATUS_PUT_SUCCESS)
         {
             $body = json_decode($response->getBody());
-            throw new Couchly_Exception($body->error.': '.$body->reason);
+            throw new ClientException($body->error.': '.$body->reason);
         }
     }
     
@@ -59,7 +61,7 @@ class Client
         if ($response->getStatusCode() !== self::STATUS_DELETE_SUCCESS)
         {
             $body = json_decode($response->getBody());
-            throw new Couchly_Exception($body->error.': '.$body->reason);
+            throw new ClientException($body->error.': '.$body->reason);
         }
     }
     
