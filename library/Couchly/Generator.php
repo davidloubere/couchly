@@ -298,7 +298,7 @@ class Generator
                 $lines = array();
                 foreach ($this->_childMap[$modelName] as $childModelName) {
                     $childClassName = $this->_classPrefix . Utils::camelize($childModelName, false);
-                    $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $childClassName ."'";
+                    $lines[] = $this->_tab . $this->_tab . $this->_tab . "'" . $childModelName . "' => '" . $this->_classNamespace . '\\' . $childClassName ."'";
                 }
                 $content[] = implode(',' . $this->_nl, $lines);
                 $content[] = $this->_tab . $this->_tab . ');';
