@@ -1,5 +1,6 @@
 {
     "name": "couchly/couchly",
+    "type": "library",
     "description": "Simple CouchDB object-document mapper",
     "license": "",
     "keywords": [
@@ -7,7 +8,14 @@
         "odm"
     ],
     "homepage": "https://github.com/davidloubere/couchly/",
+    "authors": [
+        {
+            "name": "David Loubère",
+            "email": "contact@davidloubere.com"
+        }
+    ],
     "require": {
+        "php": ">=5.3.0",
         "zendframework/zend-http": "2.*",
         "symfony/yaml": "2.*"
     }
