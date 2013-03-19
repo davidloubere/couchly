@@ -1,0 +1,52 @@
+entry:
+  fields:
+    status:
+      type: int
+    creator:
+      type: string
+    created:
+      type: int
+    published:
+      type: int
+    updated:
+      type: int
+    deleted:
+      type: int
+    permalink:
+      type: string
+    tags:
+      type: array
+    cols:
+      type: int
+
+article:
+  extends: entry
+  fields:
+    title:
+      type: string
+    summary:
+      type: string
+    content:
+      type: string
+
+image:
+  extends: entry
+  fields:
+    title:
+      type: string
+    filename:
+      type: string
+    link:
+      type: string
+
+quotation:
+  extends: entry
+  fields:
+    quote:
+      type: string
+    author:
+      type: string
+    link:
+      type: string
+    link_title:
+      type: string

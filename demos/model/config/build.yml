@@ -1,0 +1,5 @@
+dir:
+  config: /home/dloubere/sites/sandbox/couchly/demos/model/config
+  model: /home/dloubere/sites/sandbox/couchly/demos/model/model
+class:
+  namespace: CouchlyDemo\Blog

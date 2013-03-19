@@ -26,8 +26,6 @@ class Generator
     
     protected $_schema = null;
     
-    protected $_classPath = '';
-    
     protected $_classPrefix = '';
 
     protected $_classNamespace = '';
@@ -55,7 +53,6 @@ class Generator
             // Assign optional properties
             if (array_key_exists('class', $configBuild)) {
                 $class = Utils::getParam($configBuild, 'class');
-                $this->_classPath = Utils::getParam($class, 'path') ?: '';
                 $this->_classPrefix = Utils::getParam($class, 'prefix') ?: '';
                 $this->_classNamespace = Utils::getParam($class, 'namespace') ?: '';
             }
@@ -80,7 +77,7 @@ class Generator
         $fileName = Utils::camelize($modelName, false) . '.php';
         $className = $this->_computeClassName($modelName);
         
-        $this->_classMap[$className] = empty($this->_classPath) ? $fileName : $this->_classPath . '/' . $fileName;
+        $this->_classMap[$this->_classNamespace . '\\' . $className] = $this->_dirModel . '/' . $fileName;
         
         $file = $this->_dirModel . '/' . $fileName;
         $this->_log('Writing model file: ' . $file, false);

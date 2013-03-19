@@ -75,14 +75,10 @@ For now, Couchly relies on PHP 5.3 or later and some Zend Framework components.
     dir:
       config: /PATH/TO/YOUR_APP/CONFIGS
       model: /PATH/TO/YOUR_APP/MODELS
-    ```
 
-    NB : Optionally, you can define specific properties for the model classes
-    
-    ```
     class:
-      path: ./MODELS
-      prefix: Your_App_
+      namespace: Your\App\Namespace
+      prefix: YourClassPrefix    # optional
     ```
     
   - Run couchly-gen command

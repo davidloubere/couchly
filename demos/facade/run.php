@@ -1,26 +1,32 @@
 <?php
 
 use Couchly\Bootstrap;
-use Couchly\Exception;
 use Couchly\Facade;
 
 /**
- * Demo facade
- * 
- * For this demo to work, you need to create a database: curl -X PUT http://127.0.0.1:5984/db_demo1
+ * Demo "Facade"
+ *
+ * This demo works with a local CouchDB store named "db_demo_couchly"
+ * You can create it running the following command: curl -X PUT http://127.0.0.1:5984/db_demo_couchly
  */
 
+header('Content-type: text/plain');
+
 // Include Couchly bootstrap class
-require_once(dirname(realpath(__FILE__)) . '/../library/Couchly/Bootstrap.php');
+require_once(dirname(realpath(__FILE__)) . '/../../library/Couchly/Bootstrap.php');
 
-// Initialize Couchly
-Bootstrap::init();
+try {
+    /*
+     * Init
+     */
 
-// Instantiate a Couchly facade
-$couchlyFacade = new Facade('db_demo1');
+    // Initialize Couchly
+    Bootstrap::init();
 
-try
-{
+    // Instantiate a Couchly facade
+    $couchlyFacade = new Facade('db_demo_couchly');
+
+
     /*
      * Create documents
      */
@@ -32,7 +38,7 @@ try
         'lastname' => 'Doe',
         'created' => time()
     ));
-    echo "Document created (id=$id1)<br><br>";
+    echo "Document created (id=$id1)\n\n";
     
     // Create a second document
     $id2 = uniqid();
@@ -41,23 +47,21 @@ try
         'lastname' => 'Bar',
         'created' => time()
     ));
-    echo "Document created (id=$id2)<br><br>";
+    echo "Document created (id=$id2)\n\n";
 
     
     /*
      * Fetch documents
      */
     
-    echo "List of documents data<br>";
+    echo "List of documents data\n";
     $result = $couchlyFacade->fetch();
-    if (isset($result->total_rows) && $result->total_rows > 0)
-    {
-        foreach ($result->rows as $document)
-        {
-            echo "<pre>".$document->id.' - '.$document->value->firstname.' '.$document->value->lastname."</pre>";
+    if (isset($result->total_rows) && $result->total_rows > 0) {
+        foreach ($result->rows as $document) {
+            echo $document->id . ' - ' . $document->value->firstname . ' ' . $document->value->lastname;
         }
     }
-    echo "<br>";
+    echo "\n";
     
     
     /*
@@ -65,30 +69,24 @@ try
      */
     
     $ids = array($id1, $id2);
-    foreach ($ids as $id)
-    {
+    foreach ($ids as $id) {
         // Retrieve the document
         $document = $couchlyFacade->retrieve($id);
-        if (is_null($document))
-        {
+        if (is_null($document)) {
             echo "Document does not exist (id=$id)";
         }
-        else
-        {
+        else {
             echo "Document retrieved (id=$id)";
-            echo "<pre>";
             print_r($document);
-            echo "</pre>";
             
             // Delete the document
             $couchlyFacade->delete($id, $document->_rev);
-            echo "Document deleted (id=$id)<br>";
+            echo "Document deleted (id=$id)\n";
         }
-        echo "<br>";
+        echo "\n";
     }
 }
-catch (Exception $ce)
-{
-    die($ce->getMessage());
+catch (\Exception $e) {
+    die($e->getMessage());
 }
 ?>
