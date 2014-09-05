@@ -17,6 +17,7 @@
     "require": {
         "php": ">=5.3.3",
         "zendframework/zend-http": "2.*",
-        "symfony/yaml": "2.*"
+        "symfony/yaml": "2.*",
+        "phpunit/phpunit": "4.2.*"
     }
 }
