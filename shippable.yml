@@ -1,0 +1,14 @@
+language: php
+
+php:
+  - 5.4
+
+#before_script:
+#  - mkdir -p shippable/codecoverage
+#  - mkdir -p shippable/testresults
+
+#script:
+# - phpunit --log-junit shippable/testresults/junit.xml --coverage-xml shippable/codecoverage tests/calculator_test.php
+
+notifications:
+  email: false
